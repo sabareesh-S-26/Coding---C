@@ -1,0 +1,43 @@
+int cmp(const void *a, const void *b) {
+    return (*(int *)a - *(int *)b);
+}
+
+void backtrack(int *nums, int numsSize, int start,
+               int *temp, int tempSize,
+               int ***result, int *returnSize, int **returnColumnSizes) {
+
+    (*result)[*returnSize] = (int *)malloc(tempSize * sizeof(int));
+    for (int i = 0; i < tempSize; i++) {
+        (*result)[*returnSize][i] = temp[i];
+    }
+    (*returnColumnSizes)[*returnSize] = tempSize;
+    (*returnSize)++;
+
+    for (int i = start; i < numsSize; i++) {
+        if (i > start && nums[i] == nums[i - 1]) continue;
+
+        temp[tempSize] = nums[i];
+        backtrack(nums, numsSize, i + 1, temp, tempSize + 1,
+                  result, returnSize, returnColumnSizes);
+    }
+}
+
+int** subsetsWithDup(int* nums, int numsSize,
+                     int* returnSize, int** returnColumnSizes) {
+
+    int maxSubsets = 1 << numsSize;
+
+    int **result = (int **)malloc(maxSubsets * sizeof(int *));
+    *returnColumnSizes = (int *)malloc(maxSubsets * sizeof(int));
+
+    *returnSize = 0;
+    qsort(nums, numsSize, sizeof(int), cmp);
+
+    int *temp = (int *)malloc(numsSize * sizeof(int));
+
+    backtrack(nums, numsSize, 0, temp, 0,
+              &result, returnSize, returnColumnSizes);
+
+    free(temp);
+    return result;
+}
