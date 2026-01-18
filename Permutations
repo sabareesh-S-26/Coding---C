@@ -1,0 +1,39 @@
+void swap(int* a, int* b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void storePermutation(int* nums, int numsSize, int*** result, int* returnSize, int** returnColumnSizes) {
+    (*result)[*returnSize] = (int*)malloc(numsSize * sizeof(int));
+    for (int i = 0; i < numsSize; i++) {
+        (*result)[*returnSize][i] = nums[i];
+    }
+    (*returnColumnSizes)[*returnSize] = numsSize;
+    (*returnSize)++;
+}
+
+void backtrack(int* nums, int start, int numsSize, int*** result, int* returnSize, int** returnColumnSizes) {
+    if (start == numsSize) {
+        storePermutation(nums, numsSize, result, returnSize, returnColumnSizes);
+        return;
+    }
+
+    for (int i = start; i < numsSize; i++) {
+        swap(&nums[start], &nums[i]);
+        backtrack(nums, start + 1, numsSize, result, returnSize, returnColumnSizes);
+        swap(&nums[start], &nums[i]); 
+    }
+}
+
+int** permute(int* nums, int numsSize, int* returnSize, int** returnColumnSizes) {
+    int factorial = 1;
+    for (int i = 2; i <= numsSize; i++) factorial *= i;
+
+    int** result = (int**)malloc(factorial * sizeof(int*));
+    *returnColumnSizes = (int*)malloc(factorial * sizeof(int));
+    *returnSize = 0;
+
+    backtrack(nums, 0, numsSize, &result, returnSize, returnColumnSizes);
+    return result;
+}
