@@ -1,0 +1,33 @@
+void backtrack(int* nums, int numsSize, int index,
+               int* temp, int tempSize,
+               int*** result, int* returnSize, int** returnColumnSizes) {
+  
+    (*result)[*returnSize] = (int*)malloc(tempSize * sizeof(int));
+    memcpy((*result)[*returnSize], temp, tempSize * sizeof(int));
+    (*returnColumnSizes)[*returnSize] = tempSize;
+    (*returnSize)++;
+
+    for (int i = index; i < numsSize; i++) {
+        temp[tempSize] = nums[i];
+        backtrack(nums, numsSize, i + 1,
+                  temp, tempSize + 1,
+                  result, returnSize, returnColumnSizes);
+    }
+}
+
+int** subsets(int* nums, int numsSize,
+              int* returnSize, int** returnColumnSizes) {
+
+    int maxSubsets = 1 << numsSize;  
+    int** result = (int**)malloc(maxSubsets * sizeof(int*));
+    *returnColumnSizes = (int*)malloc(maxSubsets * sizeof(int));
+
+    int* temp = (int*)malloc(numsSize * sizeof(int));
+    *returnSize = 0;
+
+    backtrack(nums, numsSize, 0, temp, 0,
+              &result, returnSize, returnColumnSizes);
+
+    free(temp);
+    return result;
+}
