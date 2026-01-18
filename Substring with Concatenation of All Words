@@ -1,0 +1,72 @@
+char* strndup_local(const char* s, int n) {
+    char* p = (char*)malloc(n + 1);
+    strncpy(p, s, n);
+    p[n] = '\0';
+    return p;
+}
+
+int findWordIndex(char** words, int wordsSize, char* word) {
+    for (int i = 0; i < wordsSize; i++) {
+        if (strcmp(words[i], word) == 0)
+            return i;
+    }
+    return -1;
+}
+
+int* findSubstring(char* s, char** words, int wordsSize, int* returnSize) {
+    *returnSize = 0;
+    if (!s || wordsSize == 0) return NULL;
+
+    int sLen = strlen(s);
+    int wordLen = strlen(words[0]);
+    int totalLen = wordLen * wordsSize;
+
+    int* result = (int*)malloc(sizeof(int) * sLen);
+
+    int* wordCount = (int*)calloc(wordsSize, sizeof(int));
+    for (int i = 0; i < wordsSize; i++) {
+        int idx = findWordIndex(words, i, words[i]);
+        if (idx == -1)
+            wordCount[i]++;
+        else
+            wordCount[idx]++;
+    }
+
+    for (int i = 0; i < wordLen; i++) {
+        int left = i, count = 0;
+        int* windowCount = (int*)calloc(wordsSize, sizeof(int));
+
+        for (int right = i; right + wordLen <= sLen; right += wordLen) {
+            char* word = strndup_local(s + right, wordLen);
+            int idx = findWordIndex(words, wordsSize, word);
+
+            if (idx != -1) {
+                windowCount[idx]++;
+                count++;
+
+                while (windowCount[idx] > wordCount[idx]) {
+                    char* leftWord = strndup_local(s + left, wordLen);
+                    int leftIdx = findWordIndex(words, wordsSize, leftWord);
+                    windowCount[leftIdx]--;
+                    count--;
+                    left += wordLen;
+                    free(leftWord);
+                }
+
+                if (count == wordsSize) {
+                    result[*returnSize] = left;
+                    (*returnSize)++;
+                }
+            } else {
+                memset(windowCount, 0, sizeof(int) * wordsSize);
+                count = 0;
+                left = right + wordLen;
+            }
+            free(word);
+        }
+        free(windowCount);
+    }
+
+    free(wordCount);
+    return result;
+}
