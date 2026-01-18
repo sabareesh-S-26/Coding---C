@@ -1,0 +1,13 @@
+int main() {
+    char sentence[1000];  
+    if (fgets(sentence, sizeof(sentence), stdin) != NULL) {
+          sentence[strcspn(sentence, "\n")] = 0;
+          char *word = strtok(sentence, " ");
+          while (word != NULL) {
+               printf("%s\n", word);
+               word = strtok(NULL, " "); 
+          }
+      }
+                                                                                        
+      return 0;
+}
